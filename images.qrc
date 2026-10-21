@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/">
+        <file>../images/floppy.png</file>
+        <file>../images/play.png</file>
+        <file>../images/record.png</file>
+        <file>../images/record_stop.png</file>
+        <file>../images/stop.png</file>
+        <file>../images/clearing.png</file>
+        <file>../images/pause.png</file>
+        <file>../images/krest_black.png</file>
+        <file>../images/up_gray.png</file>
+        <file>../images/down_gray.png</file>
+        <file>../images/file_save.png</file>
+        <file>../images/file_read.png</file>
+        <file>../images/gearwheel.png</file>
+        <file>../images/connect_bad.png</file>
+        <file>../images/connect_ok.png</file>
+        <file>../images/record16x16.png</file>
+    </qresource>
+</RCC>
