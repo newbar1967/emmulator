@@ -12,16 +12,19 @@ Settings::Settings(QWidget* parent)
     , soft_filter_(view_->GetUi()->soft_filter_can_id_obj_wgt,
                    view_->GetUi()->soft_filter_can_id_obj_layout,
                    view_->GetUi()->soft_filter_id_le,
+                   view_->GetUi()->soft_filter_header_type_cbox,
                    SOFT_FILTER_MAX_NUM_ID
                    )
     , hard_filter_(view_->GetUi()->hard_filter_can_id_obj_wgt,
                    view_->GetUi()->hard_filter_can_id_obj_layout,
                    view_->GetUi()->hard_filter_id_le,
+                   view_->GetUi()->hard_filter_header_type_cbox,
                    HARD_FILTER_MAX_NUM_ID
                    )
     , color_filter_(view_->GetUi()->coloring_filter_can_id_obj_wgt,
                    view_->GetUi()->coloring_filter_can_id_obj_layout,
                    view_->GetUi()->coloring_filter_id_le,
+                   view_->GetUi()->coloring_filter_header_type_cbox,
                    SOFT_FILTER_MAX_NUM_ID
                    )
 {
@@ -33,15 +36,17 @@ Settings::Settings(QWidget* parent)
         {action_name.CANCEL_BTN, [this]() {Cancel();}},
         {action_name.LOG_DIR_BTN, [this]() {SetLogsDir();}},
         {action_name.SOFT_FILTER_ADD_ID_BTN, [this]() {soft_filter_.AddId();}},
+        {action_name.SOFT_FILTER_UPDATE_ID_BTN, [this]() {soft_filter_.UpdateId();}},
         {action_name.SOFT_FILTER_DELETE_ID_ALL_BTN, [this]() {soft_filter_.DeleteAll();}},
         {action_name.SOFT_FILTER_DELETE_ID_SELECT_BTN, [this]() {soft_filter_.DeleteSelectedId();}},
         {action_name.HARD_FILTER_ADD_ID_BTN, [this]() {hard_filter_.AddId();}},
+        {action_name.HARD_FILTER_UPDATE_ID_BTN, [this]() {hard_filter_.UpdateId();}},
         {action_name.HARD_FILTER_DELETE_ID_ALL_BTN, [this]() {hard_filter_.DeleteAll();}},
         {action_name.HARD_FILTER_DELETE_ID_SELECT_BTN, [this]() {hard_filter_.DeleteSelectedId();}},
         {action_name.COLORING_FILTER_ADD_ID_BTN, [this]() {color_filter_.AddId();}},
+        {action_name.COLORING_FILTER_UPDATE_ID_BTN, [this]() {color_filter_.UpdateId();}},
         {action_name.COLORING_FILTER_DELETE_ID_ALL_BTN, [this]() {color_filter_.DeleteAll();}},
         {action_name.COLORING_FILTER_DELETE_ID_SELECT_BTN, [this]() {color_filter_.DeleteSelectedId();}},
-        {action_name.COLORING_FILTER_COLOR_SET_ID_SELECT_BTN, [this]() {color_filter_.SetColorSelectedId();}},
         {action_name.COLORING_FILTER_MODE_CHECK, [this]() {ColoringFilterSetEnabled();}},
     };
 
@@ -63,10 +68,13 @@ Settings::Settings(QWidget* parent)
 
     // CAN header type.
     can_header_type_list_ = {
-        "стандартный",
-        "расширенный"
+        STANDART_HEADER,
+        EXTENDED_HEADER
     };
     view_->GetUi()->can_header_type_cbox->addItems(can_header_type_list_);
+    view_->GetUi()->soft_filter_header_type_cbox->addItems(can_header_type_list_);
+    view_->GetUi()->hard_filter_header_type_cbox->addItems(can_header_type_list_);
+    view_->GetUi()->coloring_filter_header_type_cbox->addItems(can_header_type_list_);
 
     // Звук при приеме CAN-сообщений.
     beep_can_need_list_ = {
@@ -159,7 +167,7 @@ void Settings::UiToModel() {
     value_.can_parameters.baud_rate = baud_rate.toDouble() * BAUD_RATE_COEF;
 
     // CAN header type.
-    value_.can_parameters.header_type = view_->GetUi()->can_header_type_cbox->currentIndex();
+    value_.can_parameters.header_type = view_->GetUi()->can_header_type_cbox->currentText();
 
     // Программный фильтр.
     value_.soft_filter_by_id = soft_filter_.FromUiToList();
@@ -192,7 +200,7 @@ void Settings::ModelToUi() {
 
     // CAN header type
     auto header_type = value_.can_parameters.header_type;
-    view_->GetUi()->can_header_type_cbox->setCurrentIndex(header_type);
+    view_->GetUi()->can_header_type_cbox->setCurrentText(header_type);
 
     // Программный фильтр.
     soft_filter_.FromListToUi(value_.soft_filter_by_id);

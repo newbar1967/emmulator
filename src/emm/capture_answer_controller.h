@@ -3,7 +3,7 @@
 #include <QObject>
 #include "capture_answer_view.h"
 #include "capture_answer_model.h"
-#include "settings.h"
+#include "config.h"
 #include "hex_edit_controller.h"
 #include "string_converter.h"
 

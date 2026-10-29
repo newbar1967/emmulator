@@ -2,11 +2,12 @@
 
 #include <QString>
 #include <QVector>
+#include <QColor>
 
 namespace cfg {
 
 struct CaptureAnswerData {
-    bool select;
+    bool select = false;
 
     QString comment;
 
@@ -19,7 +20,7 @@ struct CaptureAnswerData {
     QString answer_data;
     QString answer_random_pos;
     QString answer_random_bytes_num;
-    bool answer_random_check;
+    bool answer_random_check = false;
 };
 
 class Config final

@@ -3,72 +3,43 @@
 #include <QPointer>
 #include <QVector>
 #include <QList>
-#include <unordered_map>
 
 #include "settings_view.h"
 #include "time_convert.h"
-#include "config.h"
+#include "common_cfg.h"
 #include "filter.h"
 #include "color_filter.h"
 
 namespace cfg {
 
-struct СanParameters {
-    quint32 header_type;
-    quint32 baud_rate;
+struct CanParameters {
+    QString header_type;
+    quint32 baud_rate = 500'000;
 };
 
 struct HardSettings {
-    quint32 beep_can_need;
-    quint32 beep_can_pause;
+    quint32 beep_can_need = 0;  // Индекс.
+    quint32 beep_can_pause = 200;
 };
 
 class Settings final : public QObject
 {
-    Q_OBJECT  // Обязательно для работы фильтров событий
+    Q_OBJECT  // Обязательно для работы фильтров событий.
 
     using CallBack = std::function<void()>;
     using CallBackVector = QVector<CallBack>;
 
-    inline static const CaptureAnswerData CAPTURE_ANSWER_DATA_NEW = {
-        .select = false,
-
-        .comment = "",
-
-        .capture_id = "18DA00FA",
-        .capture_data = "",
-        .capture_pos = "0",
-        .capture_bytes_num = "4",
-
-        .answer_id = "18DAFA00",
-        .answer_data = "",
-        .answer_random_pos = "3",
-        .answer_random_bytes_num = "50",
-        .answer_random_check = false,
-    };
-
-    inline static const СanParameters CAN_PARAMETERS_DEFAULT = {
-        .header_type = 0,
-        .baud_rate = 500000
-    };
-
-    inline static const HardSettings HARD_SETTINGS_DEFAULT = {
-        .beep_can_need = 0,
-        .beep_can_pause = 200
-    };
-
     struct Value {
         QString device_address = "192.168.129.10";
         quint16 device_port = 5000;
-        CaptureAnswerData capture_answer_data_new = CAPTURE_ANSWER_DATA_NEW;
-        std::unordered_map<quint32, QColor> color_by_id;
-        std::unordered_set<quint32> soft_filter_by_id;
-        std::unordered_set<quint32> hard_filter_by_id;
-        СanParameters can_parameters = CAN_PARAMETERS_DEFAULT;
+        IdWithParameters color_by_id;
+        IdWithParameters soft_filter_by_id;
+        IdWithParameters hard_filter_by_id;
+        CanParameters can_parameters;
         utils::TimeConvert::convertType time_convert_type =
             utils::TimeConvert::convertType::SSSS_MS; // Строковое представление времени сообщения.
         bool message_coloring_mode = true;
-        HardSettings hard_settings = HARD_SETTINGS_DEFAULT;
+        HardSettings hard_settings;
     };
 
 public:

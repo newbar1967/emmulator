@@ -344,113 +344,170 @@ bool JsonStorage::LoadCanParametersFromJson(const QJsonObject& json_obj, Setting
         return false; // Неправильный формат JSON.
     }
     // Теперь можно скопировать.
-    settings.GetValue().can_parameters.header_type
-        = settings.GetCanHeaderTypeList().indexOf(header_type);
+    settings.GetValue().can_parameters.header_type = header_type;
 
     return true;
 }
 
-bool JsonStorage::LoadFilterFromJson(const QJsonArray& json_array, std::unordered_set<quint32>& filter_by_id) {
+bool JsonStorage::LoadFilterFromJson(const QJsonArray& json_array, IdWithParameters& filter_by_id) {
     filter_by_id.clear();
 
     // Идем по массиву JSON.
     for (auto it = json_array.constBegin(); it != json_array.constEnd(); ++it) {
         const auto json_value = *it;
-
-        // Извлекаем очередной id.
-        quint32 id;
-        if (!FromJsonToId(json_value, id)) {
+        quint32 id = 0;
+        IdParameters id_parameters;
+        if (!FromJsonToFilterId(json_value, id, id_parameters)) {
             return false; // Неправильный формат JSON.
         }
 
-        // Записываем id в список для фильтрации.
-        filter_by_id.insert(id);
+        filter_by_id[id] = id_parameters;
     }
 
     return true;
 }
 
-bool JsonStorage::LoadColorIdFromJson(const QJsonArray& json_array, std::unordered_map<quint32, QColor>& color_by_id) {
+bool JsonStorage::LoadColorIdFromJson(const QJsonArray& json_array, IdWithParameters& color_by_id) {
     color_by_id.clear();
 
     // Идем по массиву JSON.
     for (auto it = json_array.constBegin(); it != json_array.constEnd(); ++it) {
         const auto json_value = *it;
-        if (!json_value.isArray() && json_value.toArray().size() != 4) {
-            return false; // Неправильный формат JSON.
-        }
-
         quint32 id = 0;
-        QColor color = QColor(255, 255, 255);
-        if (!FromJsonToIdAndColor(json_value.toArray(), id, color)) {
+        IdParameters id_parameters;
+        if (!FromJsonToColorId(json_value, id, id_parameters)) {
             return false; // Неправильный формат JSON.
         }
 
-        color_by_id[id] = color;
+        color_by_id[id] = id_parameters;
     }
 
     return true;
 }
 
-bool JsonStorage::FromJsonToId(const QJsonValue& json_value, quint32& id) {
-    if (!json_value.isString()) {
+bool JsonStorage::FromJsonToFilterId(const QJsonValue& json_value, quint32& id, IdParameters& id_parameters) {
+    if (!json_value.isObject()) {
         return false; // Неправильный формат JSON.
     }
 
-    auto str = json_value.toString();
+    const auto json_obj = json_value.toObject();
 
-    if (!utils::IsHexString(str)
-        || str.size() > cfg::SettingsWindow::CAN_ID_MAX_LENGTH) { // Символов должно быть не больше 8.
+    // Проверим, содержатся ли нужные ключи.
+    const QStringList checked_keys = {
+        KEY_ANSWER_ID,
+        KEY_HEADER_TYPE
+    };
+    if (!AreJsonKeysValid(json_obj, checked_keys)) {
         return false; // Неправильный формат JSON.
     }
 
+    // Ключ "answer id".
+    QString id_str;
+    if (!FromJsonToString(json_obj,
+                          KEY_ANSWER_ID,
+                          id_str,
+                          checkOption::HEX,
+                          false)) {
+        return false; // Неправильный формат JSON.
+    }
     bool ok;
-    id = str.toInt(&ok, 16);
+    id = id_str.toInt(&ok, 16);
+    if (!ok) {
+        return false; // Неправильный формат JSON.
+    }
+
+    // Ключ "header type".
+    if (!FromJsonToString(json_obj,
+                          KEY_HEADER_TYPE,
+                          id_parameters.header_type,
+                          checkOption::NONE,
+                          false)) {
+        return false; // Неправильный формат JSON.
+    }
+    // Проверим, есть ли такая строка в combobox.
+    if (!settings_.GetCanHeaderTypeList().contains(id_parameters.header_type)) {
+        return false; // Неправильный формат JSON.
+    }
+    if (id_parameters.header_type == EXTENDED_HEADER) { // Если заголовок расширенный,
+        id |= EXTENDED_HEADER_ADD_BIT; // то взводим верхний бит ID.
+    }
 
     return true;
 }
 
-bool JsonStorage::FromJsonToColorComponent(const QJsonValue& json_value, int& component) {
-    if (!json_value.isDouble()) {
+bool JsonStorage::FromJsonToColorId(const QJsonValue& json_value, quint32& id, IdParameters& id_parameters) {
+    if (!json_value.isObject()) {
         return false; // Неправильный формат JSON.
     }
 
-    auto tmp = json_value.toInt();
-    if (tmp < 0 || tmp > 255) {
+    const auto json_obj = json_value.toObject();
+
+    // Проверим, содержатся ли нужные ключи.
+    const QStringList checked_keys = {
+        KEY_ANSWER_ID,
+        KEY_HEADER_TYPE,
+        KEY_COLOR_RED,
+        KEY_COLOR_GREEN,
+        KEY_COLOR_BLUE
+    };
+    if (!AreJsonKeysValid(json_obj, checked_keys)) {
         return false; // Неправильный формат JSON.
     }
 
-    component = tmp;
-    return true;
-}
-
-bool JsonStorage::FromJsonToIdAndColor(const QJsonArray& json_array, quint32& id, QColor& color) {
-    // Извлекаем id.
-    if (!FromJsonToId(json_array.at(0), id)) {
+    // Ключ "answer id".
+    QString id_str;
+    if (!FromJsonToString(json_obj,
+                          KEY_ANSWER_ID,
+                          id_str,
+                          checkOption::HEX,
+                          false)) {
+        return false; // Неправильный формат JSON.
+    }
+    bool ok;
+    id = id_str.toInt(&ok, 16);
+    if (!ok) {
         return false; // Неправильный формат JSON.
     }
 
-    int red = 0;
-    int green = 0;
-    int blue = 0;;
+    // Ключ "header type".
+    if (!FromJsonToString(json_obj,
+                          KEY_HEADER_TYPE,
+                          id_parameters.header_type,
+                          checkOption::NONE,
+                          false)) {
+        return false; // Неправильный формат JSON.
+    }
+    // Проверим, есть ли такая строка в combobox.
+    if (!settings_.GetCanHeaderTypeList().contains(id_parameters.header_type)) {
+        return false; // Неправильный формат JSON.
+    }
+    if (id_parameters.header_type == EXTENDED_HEADER) { // Если заголовок расширенный,
+        id |= EXTENDED_HEADER_ADD_BIT; // то взводим верхний бит ID.
+    }
 
-    // Цвет red.
-    if (!FromJsonToColorComponent(json_array.at(1), red)) {
+    // Цвета.
+    if (!json_obj.value(KEY_COLOR_RED).isDouble()
+        || !json_obj.value(KEY_COLOR_GREEN).isDouble()
+        || !json_obj.value(KEY_COLOR_BLUE).isDouble()
+        ) {
         return false; // Неправильный формат JSON.
     }
 
-    // Цвет green.
-    if (!FromJsonToColorComponent(json_array.at(2), green)) {
+    auto red = json_obj.value(KEY_COLOR_RED).toInt();
+    if (red < 0 || red > 255) {
+        return false; // Неправильный формат JSON.
+    }
+    auto green = json_obj.value(KEY_COLOR_GREEN).toInt();
+    if (green < 0 || green > 255) {
+        return false; // Неправильный формат JSON.
+    }
+    auto blue = json_obj.value(KEY_COLOR_BLUE).toInt();
+    if (blue < 0 || blue > 255) {
         return false; // Неправильный формат JSON.
     }
 
-    // Цвет blue.
-    if (!FromJsonToColorComponent(json_array.at(3), blue)) {
-        return false; // Неправильный формат JSON.
-    }
-
-    color = QColor(red, green, blue);
-    if (!color.isValid()) {
+    id_parameters.color = QColor(red, green, blue);
+    if (!id_parameters.color.isValid()) {
         return false;
     }
 
@@ -616,33 +673,43 @@ void JsonStorage::SaveCanParametersToJson(QJsonObject& json_obj) {
     json_curr_obj.insert(KEY_BAUD_RATE, QString::number(baud_rate));
     // Header type.
     auto header_type = settings_.GetValue().can_parameters.header_type;
-    json_curr_obj.insert(KEY_HEADER_TYPE, settings_.GetCanHeaderTypeList().at(header_type));
+    json_curr_obj.insert(KEY_HEADER_TYPE, header_type);
 
     json_obj.insert(KEY_CAN_PARAMETERS, json_curr_obj);
 }
 
-void JsonStorage::SaveFilterToJson(QJsonObject& json_obj, const QString key, std::unordered_set<quint32>& filter_by_id) {
+void JsonStorage::SaveFilterToJson(QJsonObject& json_obj, const QString key, IdWithParameters& filter_by_id) {
     QJsonArray json_array;
 
-    for (const auto& id : filter_by_id) {
-        auto id_str = QString::number(id, 16).toUpper().rightJustified(cfg::SettingsWindow::CAN_ID_MAX_LENGTH, '0');
-        json_array.append(id_str);
+    for (const auto& [id, id_parameters] : filter_by_id) {
+        QJsonObject json_curr_obj;
+        // id.
+        auto id_str = QString::number(id & EXTENDED_HEADER_SUB_BIT, 16).toUpper().rightJustified(cfg::SettingsWindow::CAN_ID_MAX_LENGTH, '0');
+        json_curr_obj.insert(KEY_ANSWER_ID, id_str);
+        // Header type.
+        json_curr_obj.insert(KEY_HEADER_TYPE, id_parameters.header_type);
+
+        json_array.append(json_curr_obj);
     }
 
     json_obj.insert(key, json_array);
 }
 
-void JsonStorage::SaveColorIdToJson(QJsonObject& json_obj, const QString key, std::unordered_map<quint32, QColor>& color_by_id) {
+void JsonStorage::SaveColorIdToJson(QJsonObject& json_obj, const QString key, IdWithParameters& color_by_id) {
     QJsonArray json_array;
 
-    for (const auto& [id, color] : color_by_id) {
-        QJsonArray json_curr_array;
-        auto id_str = QString::number(id, 16).toUpper().rightJustified(cfg::SettingsWindow::CAN_ID_MAX_LENGTH, '0');
-        json_curr_array.append(id_str);
-        json_curr_array.append(color.red());
-        json_curr_array.append(color.green());
-        json_curr_array.append(color.blue());
-        json_array.append(json_curr_array);
+    for (const auto& [id, id_parameters] : color_by_id) {
+        QJsonObject json_curr_obj;
+        // id.
+        auto id_str = QString::number(id & EXTENDED_HEADER_SUB_BIT, 16).toUpper().rightJustified(cfg::SettingsWindow::CAN_ID_MAX_LENGTH, '0');
+        json_curr_obj.insert(KEY_ANSWER_ID, id_str);
+        // Header type.
+        json_curr_obj.insert(KEY_HEADER_TYPE, id_parameters.header_type);
+        // Color.
+        json_curr_obj.insert(KEY_COLOR_RED, id_parameters.color.red());
+        json_curr_obj.insert(KEY_COLOR_GREEN, id_parameters.color.green());
+        json_curr_obj.insert(KEY_COLOR_BLUE, id_parameters.color.blue());
+        json_array.append(json_curr_obj);
     }
 
     json_obj.insert(key, json_array);

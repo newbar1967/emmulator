@@ -403,9 +403,17 @@ const QString MessagesDispatcher::CanMessageToQString(const CanMessage& can_mess
     QString qs;
     utils::TimeConvert time_convert(time_convert_type_);
 
-    qs += QString("%1 %2 %3 %4 ").arg(can_message.number, 6, 10, QChar('0'))
+    QString header_type;
+    if (can_message.id & EXTENDED_HEADER_ADD_BIT) {
+        header_type = "EXT";
+    } else {
+        header_type = "STD";
+    }
+
+    qs += QString("%1 %2 %3 %4 %5 ").arg(can_message.number, 6, 10, QChar('0'))
                                  .arg(time_convert.MsToString(can_message.time_stamp))
-                                 .arg(can_message.id, 8, 16, QChar('0')).toUpper()
+                                 .arg(can_message.id & EXTENDED_HEADER_SUB_BIT, 8, 16, QChar('0')).toUpper()
+                                 .arg(header_type)
                                  .arg(can_message.size, 2, 10, QChar('0'));
 
     qs += utils::QByteArrayToQString(can_message.payload, can_message.size);
@@ -474,13 +482,13 @@ QByteArray MessagesDispatcher::PrepareDataForStartEmmulatorOrMonitor() {
     out.setByteOrder(QDataStream::LittleEndian);
 
     // Записываем параметры CAN в поток.
-    out << can_parameters_.baud_rate << can_parameters_.header_type;
+    out << can_parameters_.baud_rate << static_cast<quint32>(can_parameters_.header_type == EXTENDED_HEADER);
 
     // Количество id-фильтров в поток.
     out << static_cast<quint32>(hard_filter_by_id_.size());
 
     // Сами id-фильтры.
-    for (const auto& id : hard_filter_by_id_) {
+    for (const auto& [id, id_parameters] : hard_filter_by_id_) {
         out << id;
     }
 
@@ -518,7 +526,7 @@ std::optional<QColor> MessagesDispatcher::ColoringByCanId(quint32 can_id) {
         return std::nullopt; // Без подкраски.
     }
 
-    return it->second;
+    return it->second.color;
 }
 
 bool MessagesDispatcher::FilteringByCanId(quint32 can_id) {
@@ -567,14 +575,13 @@ void MessagesDispatcher::UpdateSettings() {
     }
 }
 
-void MessagesDispatcher::PrintCanInfo(const СanParameters& can_parameters) {
+void MessagesDispatcher::PrintCanInfo(const CanParameters& can_parameters) {
     QString baud_rate = QString::number(can_parameters.baud_rate / cfg::Settings::BAUD_RATE_COEF);
-    QString header_type = settings_.GetCanHeaderTypeList().at(can_parameters.header_type);
 
     view_.SetTextCanInfoLbl("CAN "
                             + baud_rate
                             + " кбод/с, "
-                            + header_type);
+                            + can_parameters.header_type);
 }
 
 // Работа эммулятора.

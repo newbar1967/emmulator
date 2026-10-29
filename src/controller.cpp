@@ -244,7 +244,23 @@ void Controller::AllCaptureAnswersDelete() {
 // Добавить новый объект захвата и ответа.
 void Controller::AddNewCaptureAnswer() {
     // Значения полей при создании нового объекта захвата и ответа.
-    CreateCaptureAnswer(settings_.GetValue().capture_answer_data_new);
+    const CaptureAnswerData capture_answer_data{
+            .select = false,
+
+            .comment = "",
+
+            .capture_id = "18DA00FA",
+            .capture_data = "",
+            .capture_pos = "0",
+            .capture_bytes_num = "4",
+
+            .answer_id = "18DAFA00",
+            .answer_data = "",
+            .answer_random_pos = "3",
+            .answer_random_bytes_num = "50",
+            .answer_random_check = false,
+    };
+    CreateCaptureAnswer(capture_answer_data);
 }
 
 void Controller::CaptureAnswerDatasFromConfig() {

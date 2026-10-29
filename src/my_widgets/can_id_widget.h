@@ -3,6 +3,8 @@
 #include <QWidget>
 #include <QString>
 #include <QColor>
+#include <QMouseEvent>
+#include <QPainter>
 
 #include "ui_can_id_widget.h"
 
@@ -18,8 +20,14 @@ public:
     explicit CanIdWidget(QWidget *parent = nullptr)
         : QWidget(parent)
         , ui_(new Ui::CanIdWidget)
+        , mouse_pressed_(false)
+        , selected_(false)
     {
         ui_->setupUi(this);
+
+        connect(ui_->color_wgt, &ColorSquare::doubleClicked, this, [this](){
+            emit mouseColorDoubleClick();
+        });
     }
 
     ~CanIdWidget() {
@@ -46,14 +54,36 @@ public:
         ui_->color_wgt->setColor(color);
     }
 
-    bool GetSelect() {
-        return ui_->select_check->checkState();
+    bool GetSelected() const {
+        return selected_;
     }
 
     void SetColorVisible(bool visible) {
         ui_->color_wgt->setVisible(visible);
     }
 
+    void SetTextHeaderType(const QString& text) {
+        ui_->header_type_lbl->setText(text);
+    }
+
+    const QString GetTextHeaderType() const {
+        return ui_->header_type_lbl->text();
+    }
+
+signals:
+    void mouseClick();
+    void mouseColorDoubleClick();
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
+
+private:
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+
 private:
     Ui::CanIdWidget *ui_;
+    bool mouse_pressed_;
+    bool selected_;
 };
+

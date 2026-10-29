@@ -10,6 +10,7 @@
 #include "udp_server.h"
 #include "settings.h"
 #include "capture_manager.h"
+#include "common_cfg.h"
 
 class MessagesDispatcher final : public QObject {
     Q_OBJECT
@@ -139,7 +140,7 @@ private:
     void HardSettingsProcessing();
     QByteArray PrepareDataForStartEmmulatorOrMonitor();
     QByteArray PrepareDataForHardSettings();
-    void PrintCanInfo(const cfg::СanParameters& can_parameters);
+    void PrintCanInfo(const cfg::CanParameters& can_parameters);
     void EmmulatorWork(const CanMessage& can_message);
 
     static constexpr int TIMEOUT_DEFAULT = 500;
@@ -175,11 +176,11 @@ private:
     std::vector<CanMessage> can_messages_;
     std::unordered_set<quint8> send_message_types_;
     utils::TimeConvert::convertType time_convert_type_;
-    cfg::СanParameters can_parameters_;
+    cfg::CanParameters can_parameters_;
     cfg::HardSettings hard_settings_;
-    std::unordered_set<quint32> soft_filter_by_id_;
-    std::unordered_set<quint32> hard_filter_by_id_;
-    std::unordered_map<quint32, QColor> color_by_id_;
+    cfg::IdWithParameters soft_filter_by_id_;
+    cfg::IdWithParameters hard_filter_by_id_;
+    cfg::IdWithParameters color_by_id_;
     QString all_can_messages_text_;
     bool message_coloring_mode_;
     emm::CaptureManager* capture_manager_ = nullptr;

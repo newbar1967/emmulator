@@ -5,6 +5,8 @@ CONFIG += c++20
 
 VERSION = 1.0.0.1
 
+DEFINES += QT_NO_DEPRECATED_WARNINGS
+
 INCLUDEPATH += \
             $$PWD/src \
             $$PWD/src/emm \
@@ -33,6 +35,7 @@ SOURCES += \
     src/main.cpp \
     src/messages_dispatcher.cpp \
     src/my_widgets/bits_widget.cpp \
+    src/my_widgets/can_id_widget.cpp \
     src/server/udp_buffer.cpp \
     src/server/udp_server.cpp \
     src/server/udp_server_worker.cpp \
@@ -42,6 +45,7 @@ SOURCES += \
 
 HEADERS += \
     src/cfg/color_filter.h \
+    src/cfg/common_cfg.h \
     src/cfg/config.h \
     src/cfg/filter.h \
     src/cfg/settings.h \

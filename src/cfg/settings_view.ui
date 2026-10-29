@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>626</width>
-    <height>438</height>
+    <width>600</width>
+    <height>500</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>600</width>
+    <height>0</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Настройки</string>
@@ -63,7 +69,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="settings_tab">
      <property name="currentIndex">
-      <number>4</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="can_tab">
       <attribute name="title">
@@ -98,7 +104,7 @@
            <item>
             <widget class="QLabel" name="can_header_type_lbl">
              <property name="text">
-              <string>Тип заголовка:</string>
+              <string>Тип заголовка при передаче сообщения:</string>
              </property>
             </widget>
            </item>
@@ -206,17 +212,48 @@
               <item>
                <widget class="QLabel" name="soft_filter_id_lbl">
                 <property name="text">
-                 <string>ID сообщения</string>
+                 <string>ID сообщения:</string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QLineEdit" name="soft_filter_id_le"/>
               </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_17">
+              <item>
+               <widget class="QLabel" name="soft_filter_header_type_lbl">
+                <property name="maximumSize">
+                 <size>
+                  <width>81</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Тип заголовка:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="soft_filter_header_type_cbox"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_18">
               <item>
                <widget class="QPushButton" name="soft_filter_add_id_btn">
                 <property name="text">
                  <string>Добавить</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="soft_filter_update_id_btn">
+                <property name="text">
+                 <string>Редактировать</string>
                 </property>
                </widget>
               </item>
@@ -268,8 +305,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>247</width>
-               <height>136</height>
+               <width>252</width>
+               <height>167</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_2">
@@ -352,17 +389,48 @@
               <item>
                <widget class="QLabel" name="hard_filter_id_lbl">
                 <property name="text">
-                 <string>ID сообщения</string>
+                 <string>ID сообщения:</string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QLineEdit" name="hard_filter_id_le"/>
               </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_19">
+              <item>
+               <widget class="QLabel" name="hard_filter_header_type_lbl">
+                <property name="maximumSize">
+                 <size>
+                  <width>81</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Тип заголовка:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="hard_filter_header_type_cbox"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_20">
               <item>
                <widget class="QPushButton" name="hard_filter_add_id_btn">
                 <property name="text">
                  <string>Добавить</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="hard_filter_update_id_btn">
+                <property name="text">
+                 <string>Редактировать</string>
                 </property>
                </widget>
               </item>
@@ -416,8 +484,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>245</width>
-                 <height>133</height>
+                 <width>250</width>
+                 <height>164</height>
                 </rect>
                </property>
                <layout class="QGridLayout" name="gridLayout_4">
@@ -517,17 +585,52 @@
               <item>
                <widget class="QLabel" name="coloring_filter_id_lbl">
                 <property name="text">
-                 <string>ID сообщения</string>
+                 <string>ID сообщения:</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="coloring_filter_id_le"/>
+               <widget class="QLineEdit" name="coloring_filter_id_le">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
               </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_22">
+              <item>
+               <widget class="QLabel" name="coloring_filter_header_type_lbl">
+                <property name="maximumSize">
+                 <size>
+                  <width>81</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Тип заголовка:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="coloring_filter_header_type_cbox"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_23">
               <item>
                <widget class="QPushButton" name="coloring_filter_add_id_btn">
                 <property name="text">
                  <string>Добавить</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="coloring_filter_update_id_btn">
+                <property name="text">
+                 <string>Редактировать</string>
                 </property>
                </widget>
               </item>
@@ -546,17 +649,6 @@
                <widget class="QPushButton" name="coloring_filter_delete_id_all_btn">
                 <property name="text">
                  <string>Удалить все</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_12">
-              <item>
-               <widget class="QPushButton" name="coloring_filter_color_set_id_select_btn">
-                <property name="text">
-                 <string>Назначить цвет выбранным</string>
                 </property>
                </widget>
               </item>
@@ -592,8 +684,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>245</width>
-                 <height>285</height>
+                 <width>250</width>
+                 <height>347</height>
                 </rect>
                </property>
                <layout class="QGridLayout" name="gridLayout_6">

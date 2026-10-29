@@ -28,15 +28,17 @@ void SettingsWindow::SetupConnections() {
     connect(ui_->cancel_btn, &QPushButton::clicked, this, &SettingsWindow::ActionClicked);
     connect(ui_->log_dir_btn, &QPushButton::clicked, this, &SettingsWindow::ActionClicked);
     connect(ui_->soft_filter_add_id_btn, &QPushButton::clicked, this, &SettingsWindow::ActionClicked);
+    connect(ui_->soft_filter_update_id_btn, &QPushButton::clicked, this, &SettingsWindow::ActionClicked);
     connect(ui_->soft_filter_delete_id_all_btn, &QPushButton::clicked, this, &SettingsWindow::ActionClicked);
     connect(ui_->soft_filter_delete_id_select_btn, &QPushButton::clicked, this, &SettingsWindow::ActionClicked);
     connect(ui_->hard_filter_add_id_btn, &QPushButton::clicked, this, &SettingsWindow::ActionClicked);
+    connect(ui_->hard_filter_update_id_btn, &QPushButton::clicked, this, &SettingsWindow::ActionClicked);
     connect(ui_->hard_filter_delete_id_all_btn, &QPushButton::clicked, this, &SettingsWindow::ActionClicked);
     connect(ui_->hard_filter_delete_id_select_btn, &QPushButton::clicked, this, &SettingsWindow::ActionClicked);
     connect(ui_->coloring_filter_add_id_btn, &QPushButton::clicked, this, &SettingsWindow::ActionClicked);
+    connect(ui_->coloring_filter_update_id_btn, &QPushButton::clicked, this, &SettingsWindow::ActionClicked);
     connect(ui_->coloring_filter_delete_id_all_btn, &QPushButton::clicked, this, &SettingsWindow::ActionClicked);
     connect(ui_->coloring_filter_delete_id_select_btn, &QPushButton::clicked, this, &SettingsWindow::ActionClicked);
-    connect(ui_->coloring_filter_color_set_id_select_btn, &QPushButton::clicked, this, &SettingsWindow::ActionClicked);
     connect(ui_->coloring_mode_check, &QCheckBox::clicked, this, &SettingsWindow::ActionClicked);
 }
 
