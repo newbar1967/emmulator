@@ -16,5 +16,6 @@
         <file>../images/connect_bad.png</file>
         <file>../images/connect_ok.png</file>
         <file>../images/record16x16.png</file>
+        <file>../images/emmulator.png</file>
     </qresource>
 </RCC>

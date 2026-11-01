@@ -721,16 +721,18 @@ void JsonStorage::SaveMessageColoringModeToJson(QJsonObject& json_obj, const QSt
 
 std::optional<QString> JsonStorage::GetConfigPath() {
     // Папка Roaming: %APPDATA%
-    QString base_dir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
-    QString app_dir = base_dir + "/ECU Emmulator";
+    QString base_dir = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation);
 
     // Создаем подпапку для приложения.
-    QDir dir;
-    if (!dir.mkpath(app_dir)) {
+    const QString folder_name = QStringLiteral("ecu_emmulator");
+    QDir dir(base_dir);
+    // mkpath принимает относительный путь — разделители подставит сам.
+    if (!dir.mkpath(folder_name)) {
         return std::nullopt; // Не удалось создать папку.
     }
 
-    return app_dir;
+    // Возвращаем абсолютный путь к папке — уже с правильным разделителем.
+    return dir.absoluteFilePath(folder_name);
 }
 
 } // namespace cfg

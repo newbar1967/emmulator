@@ -2,6 +2,7 @@
 #include <QThread>
 #include <QMessageBox>
 #include <QTimer>
+#include <QDir>
 #include "view.h"
 #include "udp_server.h"
 #include "controller.h"
@@ -19,10 +20,21 @@ static const QString CONFIG_FILE_NAME = "config.json";
 
 int main(int argc, char *argv[])
 {
+#if !defined(Q_OS_WIN)
     QApplication app(argc, argv);
+    const QStringList args = QCoreApplication::arguments();
+    if (args.contains("--version")) {
+        QTextStream(stdout) << utils::GetAppVersionFromResources() << Qt::endl;
+        return 0;
+    }
+    QApplication::setApplicationVersion(utils::GetAppVersionFromResources());
+    app.setWindowIcon(QIcon(":/images/emmulator.png"));
+#else
+    QApplication app(argc, argv);
+    QApplication::setApplicationVersion(utils::GetAppVersionFromResources());
+#endif
     QCoreApplication::setOrganizationName("Newbar Company");
     QApplication::setApplicationName("Эмулятор ЭБУ (Ethernet <-> CAN)");
-    QApplication::setApplicationVersion(utils::GetAppVersionFromResources());
     QThread::currentThread()->setPriority(QThread::HighPriority);
     app.setStyleSheet("QStatusBar::item { border: none; }");
 
@@ -45,8 +57,15 @@ int main(int argc, char *argv[])
                     [&json_storage, &controller]() {
                         controller.CaptureAnswerDatasToConfig();
                         auto config_path = json_storage.GetConfigPath();
-                        if (!config_path.has_value()
-                            || !json_storage.Save(config_path.value() + "/" + CONFIG_FILE_NAME)) {
+                        if (!config_path.has_value()) {
+                            qWarning() << "Не удалось получить путь к последней конфигурации";
+                            return;
+                        }
+
+                        QDir dir(config_path.value());
+                        QString full_path = dir.absoluteFilePath(CONFIG_FILE_NAME);
+
+                        if (!json_storage.Save(full_path)) {
                             qWarning() << "Ошибка сохранения последней конфигурации";
                         }
                     });
@@ -55,19 +74,24 @@ int main(int argc, char *argv[])
     QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 
     // Загружаем конфигурацию из файла.
-
     auto config_path = json_storage.GetConfigPath();
-    if(!config_path.has_value()
-        || !json_storage.Load(config_path.value() + "/" + CONFIG_FILE_NAME)) {
-        settings.Update(); // Настройки будут по-умолчанию.
-        QMessageBox::information(QApplication::activeWindow(), "Информация",
-                                 "Ошибка загрузки последней конфигурации");
-    } else {
-        // Обновление конфигурации.
-        config.Update();
-        // Обновление настроек.
-        settings.Update();
+    if(config_path.has_value()) {
+        QDir dir(config_path.value());
+        QString full_path = dir.absoluteFilePath(CONFIG_FILE_NAME);
+
+        if (json_storage.Load(full_path)) {
+            // Обновление конфигурации.
+            config.Update();
+            // Обновление настроек.
+            settings.Update();
+
+            return app.exec();
+        }
     }
+
+    settings.Update(); // Настройки будут по-умолчанию.
+    QMessageBox::information(QApplication::activeWindow(), "Информация",
+                         "Ошибка загрузки последней конфигурации");
 
     return app.exec();
 }

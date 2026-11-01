@@ -13,7 +13,7 @@
 namespace cfg {
 
 struct CanParameters {
-    QString header_type;
+    QString header_type = STANDART_HEADER;
     quint32 baud_rate = 500'000;
 };
 

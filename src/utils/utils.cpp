@@ -1,16 +1,21 @@
-#include "utils.h"
-#include <windows.h>
 #include <QCoreApplication>
 #include <QLayout>
 #include <QFileInfo>
 #include <algorithm>
+#include "utils.h"
 
-#pragma comment(lib, "version.lib")
+#ifdef Q_OS_WIN
+    #include <windows.h>
+    #pragma comment(lib, "version.lib")
+#endif
 
 namespace utils {
 
 const QString GetAppVersionFromResources() {
-    QString ans = "0.0.0.0";
+#if !defined(Q_OS_WIN)
+    QString version_str = "1.0.0.1";
+#elif
+    QString version_str = "0.0.0.0";
     auto app_filename = QCoreApplication::applicationFilePath().toStdWString();
 
     UINT size = 0;
@@ -27,7 +32,7 @@ const QString GetAppVersionFromResources() {
                         // Doesn't matter if you are on 32 bit or 64 bit,
                         // DWORD is always 32 bits, so first two revision numbers
                         // come from dwFileVersionMS, last two come from dwFileVersionLS
-                        ans = QString("%1.%2.%3.%4").
+                        version_str = QString("%1.%2.%3.%4").
                         arg((verInfo->dwFileVersionMS >> 16) & 0xffff).
                         arg((verInfo->dwFileVersionMS >> 0) & 0xffff).
                         arg((verInfo->dwFileVersionLS >> 16) & 0xffff).
@@ -39,8 +44,9 @@ const QString GetAppVersionFromResources() {
 
       delete [] verData;
     }
+#endif
 
-    return ans;
+    return version_str;
 }
 
 // QByteArray в строку (с пробелами или без).

@@ -1,9 +1,10 @@
 QT += core gui widgets network
-QT += widgets
 
 CONFIG += c++20
 
-VERSION = 1.0.0.1
+win32 {
+    VERSION = 1.0.0.1
+}
 
 DEFINES += QT_NO_DEPRECATED_WARNINGS
 
@@ -79,7 +80,9 @@ FORMS += \
     src/emm/capture_answer_view.ui \
     src/view.ui
 
-RC_FILE = emmulator_resource.rc
+win32 {
+    RC_FILE = emmulator_resource.rc
+}
 
 RESOURCES += \
     images.qrc
