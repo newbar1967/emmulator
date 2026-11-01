@@ -14,7 +14,7 @@ namespace utils {
 const QString GetAppVersionFromResources() {
 #if !defined(Q_OS_WIN)
     QString version_str = "1.0.0.1";
-#elif
+#else
     QString version_str = "0.0.0.0";
     auto app_filename = QCoreApplication::applicationFilePath().toStdWString();
 
